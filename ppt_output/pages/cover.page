@@ -1,0 +1,112 @@
+pageType: cover
+background:
+  type: solid
+  color: "$background"
+elements:
+  - elementId: top-accent-bar
+    elementType: shape
+    bounds: [0, 0, 1280, 4]
+    shapeName: rect
+    fill:
+      type: gradient
+      gradientType: linear
+      angle: 0
+      stops:
+        - {position: 0, color: "#00D4AA00"}
+        - {position: 0.3, color: "$primary"}
+        - {position: 0.7, color: "$primary"}
+        - {position: 1, color: "#00D4AA00"}
+  - elementId: left-glow
+    elementType: shape
+    bounds: [0, 0, 50, 720]
+    shapeName: rect
+    fill:
+      type: gradient
+      gradientType: linear
+      angle: 0
+      stops:
+        - {position: 0, color: "#00D4AA15"}
+        - {position: 1, color: "#00D4AA00"}
+    opacity: 0.3
+  - elementId: chip-icon
+    elementType: icon
+    bounds: [580, 140, 120, 120]
+    iconName: "fas:microchip"
+    fill:
+      type: solid
+      color: "$primary"
+    opacity: 0.15
+  - elementId: main-title
+    elementType: text
+    bounds: [140, 260, 1000, 120]
+    content:
+      style: "$coverTitle"
+      align: [center, middle]
+      wrap: true
+      text: |
+        <p>基于ESP32-S3的存量家电</p>
+        <p>AI智能体统一管控系统</p>
+  - elementId: accent-line
+    elementType: shape
+    bounds: [540, 400, 200, 3]
+    shapeName: rect
+    fill:
+      type: solid
+      color: "$primary"
+  - elementId: subtitle
+    elementType: text
+    bounds: [240, 420, 800, 40]
+    content:
+      style: "$subtitle"
+      align: [center, middle]
+      text: |
+        <p>MimiClaw — $5芯片上的嵌入式AI助理</p>
+  - elementId: badge-bg
+    elementType: shape
+    bounds: [340, 520, 600, 50]
+    shapeName: rect
+    fill:
+      type: solid
+      color: "#FFFFFF15"
+    border:
+      style: solid
+      width: 1
+      color: "#FFFFFF30"
+    shadow:
+      blur: 12
+      color: "#00000040"
+      offset: [0, 4]
+  - elementId: badge-text
+    elementType: text
+    bounds: [340, 520, 600, 50]
+    content:
+      style: "$caption"
+      align: [center, middle]
+      text: |
+        <p>全国大学生嵌入式芯片与系统设计竞赛  |  乐鑫科技  |  选题五</p>
+  - elementId: bottom-line
+    elementType: shape
+    bounds: [60, 680, 1160, 1]
+    shapeName: rect
+    fill:
+      type: solid
+      color: "#FFFFFF30"
+    opacity: 0.3
+  - elementId: bottom-tag
+    elementType: text
+    bounds: [60, 690, 200, 20]
+    content:
+      style: "$caption"
+      align: [left, middle]
+      wrap: false
+      text: |
+        <p>MIMICLAW</p>
+  - elementId: bottom-page
+    elementType: text
+    bounds: [1100, 690, 120, 20]
+    content:
+      style: "$caption"
+      align: [right, middle]
+      wrap: false
+      text: |
+        <p>01 / 12</p>

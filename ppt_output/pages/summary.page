@@ -1,0 +1,249 @@
+pageType: content
+background:
+  type: solid
+  color: "$background"
+elements:
+  - elementId: top-accent-bar
+    elementType: shape
+    bounds: [0, 0, 1280, 4]
+    shapeName: rect
+    fill:
+      type: gradient
+      gradientType: linear
+      angle: 0
+      stops:
+        - {position: 0, color: "#00D4AA00"}
+        - {position: 0.3, color: "$primary"}
+        - {position: 0.7, color: "$primary"}
+        - {position: 1, color: "#00D4AA00"}
+  - elementId: corner-bar
+    elementType: shape
+    bounds: [60, 50, 4, 40]
+    shapeName: rect
+    fill:
+      type: solid
+      color: "$primary"
+  - elementId: page-title
+    elementType: text
+    bounds: [80, 48, 600, 44]
+    content:
+      style: "$title"
+      align: [left, middle]
+      wrap: false
+      text: |
+        <p>总结</p>
+  - elementId: section-1-num
+    elementType: text
+    bounds: [60, 140, 80, 60]
+    content:
+      style: "$kpi"
+      align: [left, middle]
+      wrap: false
+      text: |
+        <p>01</p>
+  - elementId: section-1-title
+    elementType: text
+    bounds: [140, 145, 500, 36]
+    content:
+      fontSize: 24
+      color: "$text"
+      fontFamily: "Oranienbaum, siyuanSongti"
+      align: [left, middle]
+      wrap: false
+      text: |
+        <p>我们做了什么</p>
+  - elementId: section-1-body
+    elementType: text
+    bounds: [60, 200, 1160, 60]
+    content:
+      fontSize: 20
+      color: "$secondary"
+      fontFamily: "Oranienbaum, siyuanSongti"
+      lineHeight: 1.6
+      align: [left, top]
+      text: |
+        <p>一套用AI让传统家电"听懂人话"的超低成本方案。一块 $5 的 ESP32-S3 芯片，通过纯C嵌入式AI智能体，实现全屋存量家电的统一自然语言管控。</p>
+  - elementId: divider-1
+    elementType: shape
+    bounds: [60, 280, 1160, 1]
+    shapeName: rect
+    fill:
+      type: solid
+      color: "#FFFFFF30"
+    opacity: 0.3
+  - elementId: section-2-num
+    elementType: text
+    bounds: [60, 300, 80, 60]
+    content:
+      style: "$kpiAccent"
+      align: [left, middle]
+      wrap: false
+      text: |
+        <p>02</p>
+  - elementId: section-2-title
+    elementType: text
+    bounds: [140, 305, 500, 36]
+    content:
+      fontSize: 24
+      color: "$text"
+      fontFamily: "Oranienbaum, siyuanSongti"
+      align: [left, middle]
+      wrap: false
+      text: |
+        <p>核心优势</p>
+  - elementId: section-2-body
+    elementType: text
+    bounds: [60, 360, 1160, 60]
+    content:
+      fontSize: 20
+      color: "$secondary"
+      fontFamily: "Oranienbaum, siyuanSongti"
+      lineHeight: 1.6
+      align: [left, top]
+      text: |
+        <p><span style="color:$primary;">$5芯片</span> + <span style="color:$primary;">自然语言</span> + <span style="color:$primary;">零更换</span> + <span style="color:$primary;">可扩展</span> — 总硬件成本约100元，无需更换任何家电，支持红外/继电器/GPIO多模态控制。</p>
+  - elementId: divider-2
+    elementType: shape
+    bounds: [60, 440, 1160, 1]
+    shapeName: rect
+    fill:
+      type: solid
+      color: "#FFFFFF30"
+    opacity: 0.3
+  - elementId: section-3-num
+    elementType: text
+    bounds: [60, 460, 80, 60]
+    content:
+      style: "$kpi"
+      align: [left, middle]
+      wrap: false
+      text: |
+        <p>03</p>
+  - elementId: section-3-title
+    elementType: text
+    bounds: [140, 465, 500, 36]
+    content:
+      fontSize: 24
+      color: "$text"
+      fontFamily: "Oranienbaum, siyuanSongti"
+      align: [left, middle]
+      wrap: false
+      text: |
+        <p>当前进展</p>
+  - elementId: section-3-body
+    elementType: text
+    bounds: [60, 520, 1160, 60]
+    content:
+      fontSize: 20
+      color: "$secondary"
+      fontFamily: "Oranienbaum, siyuanSongti"
+      lineHeight: 1.6
+      align: [left, top]
+      text: |
+        <p>核心功能已全部完成，固件已编译并在实机验证。MimiClaw 框架、飞书机器人、红外驱动、GPIO控制、OTA升级、定时任务、记忆系统均运行稳定。</p>
+  - elementId: kpi-row-bg
+    elementType: shape
+    bounds: [60, 600, 1160, 60]
+    shapeName: rect
+    fill:
+      type: solid
+      color: "#FFFFFF15"
+    border:
+      style: solid
+      width: 1
+      color: "#FFFFFF30"
+    shadow:
+      blur: 12
+      color: "#00000040"
+      offset: [0, 4]
+  - elementId: kpi-1
+    elementType: text
+    bounds: [80, 605, 250, 50]
+    content:
+      fontSize: 16
+      color: "$secondary"
+      fontFamily: "Oranienbaum, siyuanSongti"
+      align: [center, middle]
+      wrap: false
+      text: |
+        <p><span style="font-size:28px; color:$primary;">$5</span>  核心芯片</p>
+  - elementId: kpi-div-1
+    elementType: shape
+    bounds: [340, 615, 1, 30]
+    shapeName: rect
+    fill:
+      type: solid
+      color: "#FFFFFF30"
+  - elementId: kpi-2
+    elementType: text
+    bounds: [360, 605, 250, 50]
+    content:
+      fontSize: 16
+      color: "$secondary"
+      fontFamily: "Oranienbaum, siyuanSongti"
+      align: [center, middle]
+      wrap: false
+      text: |
+        <p><span style="font-size:28px; color:$primary;">~100元</span>  总成本</p>
+  - elementId: kpi-div-2
+    elementType: shape
+    bounds: [620, 615, 1, 30]
+    shapeName: rect
+    fill:
+      type: solid
+      color: "#FFFFFF30"
+  - elementId: kpi-3
+    elementType: text
+    bounds: [640, 605, 250, 50]
+    content:
+      fontSize: 16
+      color: "$secondary"
+      fontFamily: "Oranienbaum, siyuanSongti"
+      align: [center, middle]
+      wrap: false
+      text: |
+        <p><span style="font-size:28px; color:$accent;">13/15</span>  功能完成</p>
+  - elementId: kpi-div-3
+    elementType: shape
+    bounds: [900, 615, 1, 30]
+    shapeName: rect
+    fill:
+      type: solid
+      color: "#FFFFFF30"
+  - elementId: kpi-4
+    elementType: text
+    bounds: [920, 605, 280, 50]
+    content:
+      fontSize: 16
+      color: "$secondary"
+      fontFamily: "Oranienbaum, siyuanSongti"
+      align: [center, middle]
+      wrap: false
+      text: |
+        <p><span style="font-size:28px; color:$accent;">0元</span>  设备更换</p>
+  - elementId: bottom-line
+    elementType: shape
+    bounds: [60, 680, 1160, 1]
+    shapeName: rect
+    fill:
+      type: solid
+      color: "#FFFFFF30"
+    opacity: 0.3
+  - elementId: bottom-tag
+    elementType: text
+    bounds: [60, 690, 200, 20]
+    content:
+      style: "$caption"
+      align: [left, middle]
+      wrap: false
+      text: |
+        <p>MIMICLAW</p>
+  - elementId: bottom-page
+    elementType: text
+    bounds: [1100, 690, 120, 20]
+    content:
+      style: "$caption"
+      align: [right, middle]
+      wrap: false
+      text: |
+        <p>11 / 12</p>

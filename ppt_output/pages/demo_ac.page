@@ -1,0 +1,302 @@
+pageType: content
+background:
+  type: solid
+  color: "$background"
+elements:
+  - elementId: top-accent-bar
+    elementType: shape
+    bounds: [0, 0, 1280, 4]
+    shapeName: rect
+    fill:
+      type: gradient
+      gradientType: linear
+      angle: 0
+      stops:
+        - {position: 0, color: "#00D4AA00"}
+        - {position: 0.3, color: "$primary"}
+        - {position: 0.7, color: "$primary"}
+        - {position: 1, color: "#00D4AA00"}
+  - elementId: corner-bar
+    elementType: shape
+    bounds: [60, 50, 4, 40]
+    shapeName: rect
+    fill:
+      type: solid
+      color: "$primary"
+  - elementId: page-title
+    elementType: text
+    bounds: [80, 48, 600, 44]
+    content:
+      style: "$title"
+      align: [left, middle]
+      wrap: false
+      text: |
+        <p>演示①：飞书语音控制空调</p>
+  - elementId: scene-label
+    elementType: text
+    bounds: [60, 120, 200, 28]
+    content:
+      fontSize: 18
+      color: "$primary"
+      fontFamily: "Oranienbaum, siyuanSongti"
+      align: [left, middle]
+      wrap: false
+      text: |
+        <p>场景一</p>
+  - elementId: chat-bg-user
+    elementType: shape
+    bounds: [60, 170, 540, 70]
+    shapeName: rect
+    fill:
+      type: solid
+      color: "#FFFFFF15"
+    border:
+      style: solid
+      width: 1
+      color: "#FFFFFF30"
+    shadow:
+      blur: 12
+      color: "#00000040"
+      offset: [0, 4]
+  - elementId: chat-icon-user
+    elementType: icon
+    bounds: [80, 185, 32, 32]
+    iconName: "fas:user"
+    fill:
+      type: solid
+      color: "$secondary"
+  - elementId: chat-text-user
+    elementType: text
+    bounds: [125, 180, 450, 50]
+    content:
+      fontSize: 18
+      color: "$text"
+      fontFamily: "Oranienbaum, siyuanSongti"
+      align: [left, middle]
+      wrap: true
+      text: |
+        <p>"打开空调，设置26度"</p>
+  - elementId: chat-arrow
+    elementType: shape
+    bounds: [330, 240, 0, 40]
+    shapeName: straightConnector1
+    arrow: [null, "arrow"]
+    border:
+      style: solid
+      width: 2
+      color: "$primary"
+  - elementId: chat-bg-ai
+    elementType: shape
+    bounds: [60, 280, 540, 70]
+    shapeName: rect
+    fill:
+      type: solid
+      color: "#00D4AA20"
+    border:
+      style: solid
+      width: 1
+      color: "$primary"
+  - elementId: chat-icon-ai
+    elementType: icon
+    bounds: [80, 295, 32, 32]
+    iconName: "fas:robot"
+    fill:
+      type: solid
+      color: "$primary"
+  - elementId: chat-text-ai
+    elementType: text
+    bounds: [125, 290, 450, 50]
+    content:
+      fontSize: 18
+      color: "$text"
+      fontFamily: "Oranienbaum, siyuanSongti"
+      align: [left, middle]
+      wrap: true
+      text: |
+        <p>已为您打开空调，制冷模式，26°C</p>
+  - elementId: result-bg
+    elementType: shape
+    bounds: [60, 390, 540, 80]
+    shapeName: rect
+    fill:
+      type: solid
+      color: "#FFFFFF15"
+    shadow:
+      blur: 12
+      color: "#00000040"
+      offset: [0, 4]
+    border:
+      style: solid
+      width: 1
+      color: "$accent"
+  - elementId: result-icon
+    elementType: icon
+    bounds: [80, 410, 36, 36]
+    iconName: "fas:circle-check"
+    fill:
+      type: solid
+      color: "$accent"
+  - elementId: result-text
+    elementType: text
+    bounds: [130, 400, 450, 60]
+    content:
+      fontSize: 18
+      color: "$text"
+      fontFamily: "Oranienbaum, siyuanSongti"
+      align: [left, middle]
+      wrap: true
+      text: |
+        <p>空调响应：26度制冷模式启动</p>
+  - elementId: scene2-label
+    elementType: text
+    bounds: [660, 120, 200, 28]
+    content:
+      fontSize: 18
+      color: "$primary"
+      fontFamily: "Oranienbaum, siyuanSongti"
+      align: [left, middle]
+      wrap: false
+      text: |
+        <p>场景二（进阶）</p>
+  - elementId: chat-bg-user-2
+    elementType: shape
+    bounds: [660, 170, 560, 70]
+    shapeName: rect
+    fill:
+      type: solid
+      color: "#FFFFFF15"
+    border:
+      style: solid
+      width: 1
+      color: "#FFFFFF30"
+    shadow:
+      blur: 12
+      color: "#00000040"
+      offset: [0, 4]
+  - elementId: chat-icon-user-2
+    elementType: icon
+    bounds: [680, 185, 32, 32]
+    iconName: "fas:user"
+    fill:
+      type: solid
+      color: "$secondary"
+  - elementId: chat-text-user-2
+    elementType: text
+    bounds: [725, 180, 470, 50]
+    content:
+      fontSize: 18
+      color: "$text"
+      fontFamily: "Oranienbaum, siyuanSongti"
+      align: [left, middle]
+      wrap: true
+      text: |
+        <p>"有点热"</p>
+  - elementId: chat-arrow-2
+    elementType: shape
+    bounds: [940, 240, 0, 40]
+    shapeName: straightConnector1
+    arrow: [null, "arrow"]
+    border:
+      style: solid
+      width: 2
+      color: "$primary"
+  - elementId: chat-bg-ai-2
+    elementType: shape
+    bounds: [660, 280, 560, 100]
+    shapeName: rect
+    fill:
+      type: solid
+      color: "#00D4AA20"
+    border:
+      style: solid
+      width: 1
+      color: "$primary"
+  - elementId: chat-icon-ai-2
+    elementType: icon
+    bounds: [680, 300, 32, 32]
+    iconName: "fas:robot"
+    fill:
+      type: solid
+      color: "$primary"
+  - elementId: chat-text-ai-2
+    elementType: text
+    bounds: [725, 290, 470, 80]
+    content:
+      fontSize: 18
+      color: "$text"
+      fontFamily: "Oranienbaum, siyuanSongti"
+      align: [left, middle]
+      wrap: true
+      text: |
+        <p>检测到室温偏高，已为您将空调调至24°C制冷模式</p>
+  - elementId: result-bg-2
+    elementType: shape
+    bounds: [660, 410, 560, 80]
+    shapeName: rect
+    fill:
+      type: solid
+      color: "#FFFFFF15"
+    shadow:
+      blur: 12
+      color: "#00000040"
+      offset: [0, 4]
+    border:
+      style: solid
+      width: 1
+      color: "$accent"
+  - elementId: result-icon-2
+    elementType: icon
+    bounds: [680, 430, 36, 36]
+    iconName: "fas:circle-check"
+    fill:
+      type: solid
+      color: "$accent"
+  - elementId: result-text-2
+    elementType: text
+    bounds: [730, 420, 470, 60]
+    content:
+      fontSize: 18
+      color: "$text"
+      fontFamily: "Oranienbaum, siyuanSongti"
+      align: [left, middle]
+      wrap: true
+      text: |
+        <p>AI 自动判断意图，无需精确指令</p>
+  - elementId: video-note
+    elementType: text
+    bounds: [60, 540, 1160, 100]
+    content:
+      fontSize: 16
+      color: "$secondary"
+      fontFamily: "Oranienbaum, siyuanSongti"
+      lineHeight: 1.6
+      align: [center, middle]
+      text: |
+        <p>▶ 此处配合视频演示段落</p>
+        <p>实机演示：飞书群发送指令 → ESP32-S3 接收 → 红外发射 → 空调响应</p>
+  - elementId: bottom-line
+    elementType: shape
+    bounds: [60, 680, 1160, 1]
+    shapeName: rect
+    fill:
+      type: solid
+      color: "#FFFFFF30"
+    opacity: 0.3
+  - elementId: bottom-tag
+    elementType: text
+    bounds: [60, 690, 200, 20]
+    content:
+      style: "$caption"
+      align: [left, middle]
+      wrap: false
+      text: |
+        <p>MIMICLAW</p>
+  - elementId: bottom-page
+    elementType: text
+    bounds: [1100, 690, 120, 20]
+    content:
+      style: "$caption"
+      align: [right, middle]
+      wrap: false
+      text: |
+        <p>06 / 12</p>

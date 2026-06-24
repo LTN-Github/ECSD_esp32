@@ -1,0 +1,67 @@
+title: "基于ESP32-S3的存量家电AI智能体统一管控系统"
+size: [1280, 720]
+theme:
+  colors:
+    primary: "#00D4AA"
+    secondary: "#94A3B8"
+    accent: "#F59E0B"
+    background: "#0B0F19"
+    surface: "#111827"
+    text: "#F8FAFC"
+    muted: "#334155"
+  textStyles:
+    title:
+      fontSize: 32
+      color: "$text"
+      fontFamily: "Oranienbaum, siyuanSongti"
+    coverTitle:
+      fontSize: 48
+      color: "$text"
+      fontFamily: "Oranienbaum, siyuanSongti"
+    subtitle:
+      fontSize: 22
+      color: "$secondary"
+      fontFamily: "Oranienbaum, siyuanSongti"
+    body:
+      fontSize: 18
+      color: "$text"
+      fontFamily: "Oranienbaum, siyuanSongti"
+      lineHeight: 1.6
+    caption:
+      fontSize: 14
+      color: "$secondary"
+      fontFamily: "Oranienbaum, siyuanSongti"
+    kpi:
+      fontSize: 48
+      color: "$primary"
+      fontFamily: "Oranienbaum, siyuanSongti"
+    kpiAccent:
+      fontSize: 48
+      color: "$accent"
+      fontFamily: "Oranienbaum, siyuanSongti"
+  tableStyles:
+    default:
+      fontSize: 16
+      fontFamily: "Oranienbaum, siyuanSongti"
+      headerFill: "$primary"
+      headerColor: "#000000"
+      headerBold: true
+      bodyFill: ["$surface", "$background"]
+      bodyColor: "$text"
+      border:
+        style: solid
+        width: 1
+        color: "$muted"
+pages:
+  - pages/cover.page
+  - pages/pain_points.page
+  - pages/solution.page
+  - pages/tech_principle.page
+  - pages/hardware.page
+  - pages/demo_ac.page
+  - pages/demo_light.page
+  - pages/progress.page
+  - pages/innovations.page
+  - pages/scenarios.page
+  - pages/summary.page
+  - pages/final.page

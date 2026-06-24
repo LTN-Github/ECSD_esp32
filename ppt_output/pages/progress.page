@@ -1,0 +1,189 @@
+pageType: content
+background:
+  type: solid
+  color: "$background"
+elements:
+  - elementId: top-accent-bar
+    elementType: shape
+    bounds: [0, 0, 1280, 4]
+    shapeName: rect
+    fill:
+      type: gradient
+      gradientType: linear
+      angle: 0
+      stops:
+        - {position: 0, color: "#00D4AA00"}
+        - {position: 0.3, color: "$primary"}
+        - {position: 0.7, color: "$primary"}
+        - {position: 1, color: "#00D4AA00"}
+  - elementId: corner-bar
+    elementType: shape
+    bounds: [60, 50, 4, 40]
+    shapeName: rect
+    fill:
+      type: solid
+      color: "$primary"
+  - elementId: page-title
+    elementType: text
+    bounds: [80, 48, 700, 44]
+    content:
+      style: "$title"
+      align: [left, middle]
+      wrap: false
+      text: |
+        <p>开发状态：核心功能已全部完成</p>
+  - elementId: done-label
+    elementType: text
+    bounds: [60, 120, 200, 28]
+    content:
+      fontSize: 18
+      color: "$primary"
+      fontFamily: "Oranienbaum, siyuanSongti"
+      align: [left, middle]
+      wrap: false
+      text: |
+        <p>✅ 已完成</p>
+  - elementId: done-list
+    elementType: text
+    bounds: [60, 160, 560, 440]
+    content:
+      fontSize: 16
+      color: "$text"
+      fontFamily: "Oranienbaum, siyuanSongti"
+      lineHeight: 1.8
+      align: [left, top]
+      text: |
+        <p><span style="color:$primary;">✓</span>  MimiClaw 嵌入式AI智能体框架</p>
+        <p><span style="color:$primary;">✓</span>  飞书机器人（消息收发）</p>
+        <p><span style="color:$primary;">✓</span>  LLM 代理（DeepSeek / Claude）</p>
+        <p><span style="color:$primary;">✓</span>  红外驱动（RMT协议）</p>
+        <p><span style="color:$primary;">✓</span>  美的/格力空调预设码</p>
+        <p><span style="color:$primary;">✓</span>  红外学习（32组码存储）</p>
+        <p><span style="color:$primary;">✓</span>  GPIO 继电器控制</p>
+        <p><span style="color:$primary;">✓</span>  WS2812 全彩灯带</p>
+        <p><span style="color:$primary;">✓</span>  ESP-NOW 多设备组网</p>
+        <p><span style="color:$primary;">✓</span>  WiFi 配网（Captive Portal）</p>
+        <p><span style="color:$primary;">✓</span>  OTA 远程升级</p>
+        <p><span style="color:$primary;">✓</span>  定时任务（Cron）</p>
+        <p><span style="color:$primary;">✓</span>  记忆系统（SPIFFS存储）</p>
+  - elementId: todo-label
+    elementType: text
+    bounds: [660, 120, 200, 28]
+    content:
+      fontSize: 18
+      color: "$accent"
+      fontFamily: "Oranienbaum, siyuanSongti"
+      align: [left, middle]
+      wrap: false
+      text: |
+        <p>○ 待完成</p>
+  - elementId: todo-list
+    elementType: text
+    bounds: [660, 160, 560, 200]
+    content:
+      fontSize: 16
+      color: "$secondary"
+      fontFamily: "Oranienbaum, siyuanSongti"
+      lineHeight: 1.8
+      align: [left, top]
+      text: |
+        <p>○  独立子模块固件（从设备）</p>
+        <p>○  语音交互硬件（麦克风阵列）</p>
+        <p>○  更丰富的家电预设码库</p>
+  - elementId: status-kpi-bg
+    elementType: shape
+    bounds: [660, 400, 560, 180]
+    shapeName: rect
+    fill:
+      type: solid
+      color: "#FFFFFF15"
+    border:
+      style: solid
+      width: 1
+      color: "#FFFFFF30"
+    shadow:
+      blur: 12
+      color: "#00000040"
+      offset: [0, 4]
+  - elementId: status-kpi-title
+    elementType: text
+    bounds: [680, 415, 520, 28]
+    content:
+      fontSize: 16
+      color: "$secondary"
+      fontFamily: "Oranienbaum, siyuanSongti"
+      align: [left, middle]
+      wrap: false
+      text: |
+        <p>项目进度</p>
+  - elementId: status-kpi-number
+    elementType: text
+    bounds: [680, 445, 200, 60]
+    content:
+      style: "$kpi"
+      align: [left, middle]
+      wrap: false
+      text: |
+        <p>13/15</p>
+  - elementId: status-kpi-detail
+    elementType: text
+    bounds: [900, 445, 300, 60]
+    content:
+      fontSize: 18
+      color: "$text"
+      fontFamily: "Oranienbaum, siyuanSongti"
+      align: [left, middle]
+      wrap: true
+      text: |
+        <p>核心功能已完成<br>固件已编译并在实机验证</p>
+  - elementId: status-bar-bg
+    elementType: shape
+    bounds: [680, 520, 520, 8]
+    shapeName: rect
+    fill:
+      type: solid
+      color: "#FFFFFF30"
+  - elementId: status-bar-fill
+    elementType: shape
+    bounds: [680, 520, 450, 8]
+    shapeName: rect
+    fill:
+      type: solid
+      color: "$primary"
+  - elementId: status-bar-text
+    elementType: text
+    bounds: [680, 555, 520, 20]
+    content:
+      fontSize: 14
+      color: "$secondary"
+      fontFamily: "Oranienbaum, siyuanSongti"
+      align: [right, middle]
+      wrap: false
+      text: |
+        <p>87% 完成度</p>
+  - elementId: bottom-line
+    elementType: shape
+    bounds: [60, 680, 1160, 1]
+    shapeName: rect
+    fill:
+      type: solid
+      color: "#FFFFFF30"
+    opacity: 0.3
+  - elementId: bottom-tag
+    elementType: text
+    bounds: [60, 690, 200, 20]
+    content:
+      style: "$caption"
+      align: [left, middle]
+      wrap: false
+      text: |
+        <p>MIMICLAW</p>
+  - elementId: bottom-page
+    elementType: text
+    bounds: [1100, 690, 120, 20]
+    content:
+      style: "$caption"
+      align: [right, middle]
+      wrap: false
+      text: |
+        <p>08 / 12</p>

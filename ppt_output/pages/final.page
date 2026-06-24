@@ -1,0 +1,115 @@
+pageType: final
+background:
+  type: solid
+  color: "$background"
+elements:
+  - elementId: top-accent-bar
+    elementType: shape
+    bounds: [0, 0, 1280, 4]
+    shapeName: rect
+    fill:
+      type: gradient
+      gradientType: linear
+      angle: 0
+      stops:
+        - {position: 0, color: "#00D4AA00"}
+        - {position: 0.3, color: "$primary"}
+        - {position: 0.7, color: "$primary"}
+        - {position: 1, color: "#00D4AA00"}
+  - elementId: left-glow
+    elementType: shape
+    bounds: [0, 0, 50, 720]
+    shapeName: rect
+    fill:
+      type: gradient
+      gradientType: linear
+      angle: 0
+      stops:
+        - {position: 0, color: "#00D4AA15"}
+        - {position: 1, color: "#00D4AA00"}
+    opacity: 0.3
+  - elementId: chip-icon
+    elementType: icon
+    bounds: [580, 160, 120, 120]
+    iconName: "fas:microchip"
+    fill:
+      type: solid
+      color: "$primary"
+    opacity: 0.15
+  - elementId: main-thanks
+    elementType: text
+    bounds: [240, 260, 800, 80]
+    content:
+      style: "$coverTitle"
+      align: [center, middle]
+      wrap: false
+      text: |
+        <p>感谢聆听</p>
+  - elementId: accent-line
+    elementType: shape
+    bounds: [540, 360, 200, 3]
+    shapeName: rect
+    fill:
+      type: solid
+      color: "$primary"
+  - elementId: thanks-body
+    elementType: text
+    bounds: [240, 390, 800, 120]
+    content:
+      fontSize: 18
+      color: "$secondary"
+      fontFamily: "Oranienbaum, siyuanSongti"
+      lineHeight: 1.8
+      align: [center, top]
+      text: |
+        <p>感谢各位评委老师的聆听与指导</p>
+        <p>感谢乐鑫科技提供的开发板和技术支持</p>
+        <p>感谢 MimiClaw 开源社区</p>
+  - elementId: welcome
+    elementType: text
+    bounds: [340, 540, 600, 40]
+    content:
+      fontSize: 24
+      color: "$primary"
+      fontFamily: "Oranienbaum, siyuanSongti"
+      align: [center, middle]
+      wrap: false
+      text: |
+        <p>欢迎提问！</p>
+  - elementId: photo-note
+    elementType: text
+    bounds: [60, 640, 1160, 24]
+    content:
+      fontSize: 12
+      color: "#FFFFFF30"
+      fontFamily: "Oranienbaum, siyuanSongti"
+      align: [center, middle]
+      wrap: false
+      text: |
+        <p>⚠️ 此处放置作品实物照片（不出现学校名称/校徽）</p>
+  - elementId: bottom-line
+    elementType: shape
+    bounds: [60, 680, 1160, 1]
+    shapeName: rect
+    fill:
+      type: solid
+      color: "#FFFFFF30"
+    opacity: 0.3
+  - elementId: bottom-tag
+    elementType: text
+    bounds: [60, 690, 200, 20]
+    content:
+      style: "$caption"
+      align: [left, middle]
+      wrap: false
+      text: |
+        <p>MIMICLAW</p>
+  - elementId: bottom-page
+    elementType: text
+    bounds: [1100, 690, 120, 20]
+    content:
+      style: "$caption"
+      align: [right, middle]
+      wrap: false
+      text: |
+        <p>12 / 12</p>
