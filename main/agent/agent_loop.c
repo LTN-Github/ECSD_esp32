@@ -274,14 +274,11 @@ static void agent_loop_task(void *arg)
 
         /* 5. Send response */
         if (final_text && final_text[0]) {
-            /* Save user msg to session. Only save assistant text when NO tools were used,
-             * otherwise the text reply pattern contaminates future tool-calling behavior. */
+            /* Save user msg and assistant reply to session.
+             * Always save assistant text so the LLM sees prior commands were
+             * already handled — prevents re-executing old tool calls. */
             esp_err_t save_user = session_append(msg.chat_id, "user", msg.content);
-            esp_err_t save_asst = ESP_OK;
-            bool tools_were_used = (iteration > 0);
-            if (!tools_were_used) {
-                save_asst = session_append(msg.chat_id, "assistant", final_text);
-            }
+            esp_err_t save_asst = session_append(msg.chat_id, "assistant", final_text);
             if (save_user != ESP_OK || save_asst != ESP_OK) {
                 ESP_LOGW(TAG, "Session save failed for chat %s (user=%s, assistant=%s)",
                          msg.chat_id,
