@@ -930,6 +930,55 @@ static int cmd_device_info(int argc, char **argv)
     return 0;
 }
 
+/* --- discover command --- */
+static int cmd_discover(int argc, char **argv)
+{
+    (void)argc; (void)argv;
+#if __has_include("espnow/esp_now_device.h")
+    printf("Discovering ESP-NOW peers (5s timeout)...\n");
+    int n = esp_now_device_discover_peers(5000);
+    if (n < 0) {
+        printf("Discovery failed (check role is master, ESP-NOW ready)\n");
+        return 1;
+    }
+
+    printf("Found %d slave(s):\n", n);
+    if (n > 0) {
+        esp_now_slave_info_t slaves[8];
+        int count = esp_now_device_get_slaves(slaves, 8);
+        for (int i = 0; i < count; i++) {
+            printf("  [%d] %s  MAC=%02X:%02X:%02X:%02X:%02X:%02X  %s\n",
+                   i + 1,
+                   slaves[i].device_id,
+                   slaves[i].mac[0], slaves[i].mac[1], slaves[i].mac[2],
+                   slaves[i].mac[3], slaves[i].mac[4], slaves[i].mac[5],
+                   slaves[i].online ? "online" : "offline");
+        }
+    }
+#else
+    printf("ESP-NOW is not enabled in this build.\n");
+#endif
+    return 0;
+}
+
+/* --- espnow_send command --- */
+static int cmd_espnow_send(int argc, char **argv)
+{
+    if (argc < 3) {
+        printf("Usage: espnow_send <device_id> <json_cmd>\n");
+        printf("  e.g.  espnow_send esp32-5314 '{\"tool\":\"ws2812_set\",\"args\":{\"red\":255,\"green\":0,\"blue\":0}}'\n");
+        return 1;
+    }
+#if __has_include("espnow/esp_now_device.h")
+    esp_err_t err = esp_now_device_send_command(argv[1], argv[2]);
+    printf("espnow_send status: %s\n", esp_err_to_name(err));
+    return (err == ESP_OK) ? 0 : 1;
+#else
+    printf("ESP-NOW is not enabled in this build.\n");
+    return 1;
+#endif
+}
+
 /* --- restart command --- */
 static int cmd_restart(int argc, char **argv)
 {
@@ -1277,6 +1326,22 @@ esp_err_t serial_cli_init(void)
         .func = &cmd_device_info,
     };
     esp_console_cmd_register(&device_info_cmd);
+
+    /* discover */
+    esp_console_cmd_t discover_cmd = {
+        .command = "discover",
+        .help = "Re-discover ESP-NOW peers (broadcast + 5s wait)",
+        .func = &cmd_discover,
+    };
+    esp_console_cmd_register(&discover_cmd);
+
+    /* espnow_send */
+    esp_console_cmd_t espnow_send_cmd = {
+        .command = "espnow_send",
+        .help = "Send ESP-NOW command to slave: espnow_send <device_id> <json>",
+        .func = &cmd_espnow_send,
+    };
+    esp_console_cmd_register(&espnow_send_cmd);
 
     /* restart */
     esp_console_cmd_t restart_cmd = {

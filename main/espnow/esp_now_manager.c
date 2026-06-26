@@ -209,6 +209,21 @@ esp_err_t esp_now_manager_add_peer(const uint8_t *peer_addr)  // 添加对等节
     return ret;                                           // 返回底层API的原始结果
 }
 
+esp_err_t esp_now_manager_ensure_peer(const uint8_t *peer_addr)
+{
+    esp_err_t ret = esp_now_manager_add_peer(peer_addr);
+    if (ret == ESP_ERR_ESPNOW_EXIST) {
+        esp_now_peer_info_t peer = {
+            .channel = 0,
+            .ifidx = WIFI_IF_STA,
+            .encrypt = false,
+        };
+        memcpy(peer.peer_addr, peer_addr, ESP_NOW_ETH_ALEN);
+        ret = esp_now_mod_peer(&peer);
+    }
+    return ret;
+}
+
 /**
  * 函数名: esp_now_manager_register_recv_handler
  * 功能: 注册外部接收处理器，当收到ESP-NOW数据时优先调用此处理器

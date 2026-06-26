@@ -819,7 +819,7 @@ static void draw_page_network(void)
     }
 
 #if __has_include("espnow/esp_now_device.h")
-    int peers = 0; /* TODO: expose esp_now peer count */
+    int peers = esp_now_device_get_slaves(NULL, 0);
     snprintf(buf, sizeof(buf), "ESP-NOW: %d peers", peers);
     fb_draw_str(0, y, buf);  y += 8;
 #endif
@@ -841,7 +841,22 @@ static void draw_page_espnow_peers(void)
     y += 8;
     fb_draw_str(0, y, esp_now_device_is_master() ? "Role: Master" : "Role: Slave");
     y += 8;
-    fb_draw_str(0, y, "(peer list TBD)");
+
+    int total = esp_now_device_get_slaves(NULL, 0);
+    if (total > 0) {
+        esp_now_slave_info_t slaves[4];
+        int n = esp_now_device_get_slaves(slaves, 4);
+        for (int i = 0; i < n && y < 56; i++) {
+            char line[40];
+            snprintf(line, sizeof(line), "%s  %s",
+                     slaves[i].device_id,
+                     slaves[i].online ? "ON" : "OFF");
+            fb_draw_str(0, y, line);
+            y += 8;
+        }
+    } else {
+        fb_draw_str(0, y, "No peers");
+    }
 #else
     fb_draw_str(0, y, "ESP-NOW: disabled");  y += 8;
     fb_draw_str(0, y, "Standalone mode");

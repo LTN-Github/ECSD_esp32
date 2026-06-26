@@ -72,6 +72,12 @@ esp_err_t esp_now_manager_send(const uint8_t *peer_addr, const uint8_t *data, si
 esp_err_t esp_now_manager_add_peer(const uint8_t *peer_addr);
 
 /**
+ * 函数名: esp_now_manager_ensure_peer
+ * 功能: 确保对等节点在peer表中（存在则mod，不存在则add）
+ */
+esp_err_t esp_now_manager_ensure_peer(const uint8_t *peer_addr);
+
+/**
  * 函数名: esp_now_manager_register_recv_handler
  * 功能: 注册外部接收处理器，当收到ESP-NOW数据时优先调用此处理器
  * 参数:

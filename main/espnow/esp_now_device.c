@@ -183,6 +183,9 @@ static void generate_default_id(char *out, size_t size)   // 生成默认设备I
  */
 static void respond_discover(const uint8_t *requester_mac)  // 响应发现请求函数定义
 {
+    /* Ensure requester is in the peer table before replying */
+    esp_now_manager_ensure_peer(requester_mac);
+
     esp_now_discover_rsp_t rsp;                           // 声明发现响应结构体变量
     memset(&rsp, 0, sizeof(rsp));                         // 将响应结构体内存全部清零，防止残留数据
     rsp.proto = ESPNOW_PROTO_DISCOVER_RSP;                // 设置协议类型为"发现响应"
@@ -247,9 +250,10 @@ static bool device_recv_handler(const uint8_t *src_addr,  // 设备接收处理�
         /* 检查是否已存在 */
         for (int i = 0; i < s_slave_count; i++) {         // 遍历当前已知的从设备列表
             if (memcmp(s_slaves[i].mac, rsp->mac, 6) == 0) {  // 比较响应中的MAC与已知从设备MAC是否相同
-                ESP_LOGD(TAG, "Slave %s already known, updating online=true",  // MAC已存在
-                         rsp->device_id);                 // 输出DEBUG日志记录已知设备ID
+                ESP_LOGI(TAG, "Discovery rsp from known slave %s (online=true)",  // 已知MAC
+                         rsp->device_id);                 // 输出INFO日志记录已知设备ID
                 s_slaves[i].online = true;                // 将该从设备标记为在线状态
+                s_disco_rsp_received++;                   // 本次发现响应计数
                 return true;                              // 返回true，已处理
             }
         }

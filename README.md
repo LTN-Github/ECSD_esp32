@@ -397,6 +397,7 @@ mimi> oled_list         # 列出所有菜单页面
 ```
 mimi> set_device_id bedroom      # 设置设备 ID
 mimi> set_role master            # 设置角色（master/slave）
+mimi> set_role slave             # 设置角色（master/slave）
 mimi> device_info                # 查看设备 ID、角色、MAC 地址
 ```
 
@@ -549,7 +550,5 @@ git push origin master:main
 
 ---
 
-**v1.7.1** — 2025-06-26 10:07
-- 红外：默认 TX 模式，修复 RMT 发送超时
-- 按键：更换 IO口，纯轮询消抖替代 ISR
-- OLED：修复子页面父级编号错误
+**v1.7.2** — 2025-06-26 23:09
+- 修复了重复执行已完成任务的bug
