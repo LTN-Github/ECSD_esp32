@@ -539,14 +539,9 @@ MIT
 
 共 **12 个**空闲 GPIO 可用于扩展功能。GPIO5/6/7 在 QIO Flash 模式下为 FSPI 接口引脚，空闲时可用但需确认 Flash 实际运行在 DIO 模式。GPIO45 为 Strapping pin，上电时决定启动模式，外部电路需确保上电电平正确。
 
+---
 
-
-## Star History
-
-<a href="https://www.star-history.com/?repos=memovai%2Fmimiclaw&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/image?repos=memovai/mimiclaw&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/image?repos=memovai/mimiclaw&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/image?repos=memovai/mimiclaw&type=date&legend=top-left" />
- </picture>
-</a>
+**v1.0.1** — 2025-06-26 10::07
+- 红外：默认 TX 模式，修复 RMT 发送超时
+- 按键：更换 IO口，纯轮询消抖替代 ISR
+- OLED：修复子页面父级编号错误
