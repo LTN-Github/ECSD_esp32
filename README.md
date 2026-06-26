@@ -542,6 +542,7 @@ MIT
 ---
 
 #### 修改代码后
+cd "C:\Users\LTN15\Desktop\ECSD\mimiclaw\mimiclaw-main\mimiclaw-main"
 git add -A
 git commit -m "你的修改说明"
 git push origin master:main
