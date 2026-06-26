@@ -133,8 +133,8 @@
 #define MIMI_IR_TX_RESOLUTION_HZ     10000000 /* 10 MHz for precise carrier */
 #define MIMI_IR_CARRIER_HZ           38000    /* NEC standard 38kHz */
 #define MIMI_IR_RX_BUF_SYMBOLS       256      /* Max symbols per capture */
-#define MIMI_IR_RX_MEM_BLOCKS        64       /* RMT block size in symbols (v5.5: ≥48) */
-#define MIMI_IR_TX_MEM_BLOCKS        64       /* RMT block size in symbols */
+#define MIMI_IR_RX_MEM_BLOCKS        48       /* RMT block size: 1 hw block */
+#define MIMI_IR_TX_MEM_BLOCKS        48       /* RMT block size: 1 hw block (SOC_RMT_MEM_WORDS_PER_CHANNEL) */
 #define MIMI_IR_CAPTURE_TIMEOUT_MS   5000     /* 5s to point remote and press */
 #define MIMI_IR_CODE_FILE            MIMI_SPIFFS_BASE "/ir_codes.json"
 #define MIMI_IR_MAX_CODES            32       /* Max stored IR codes */
@@ -187,11 +187,11 @@
 #define MIMI_FONT_CHINESE_PATH     MIMI_SPIFFS_BASE "/fonts/hzk16.bin"
 #define MIMI_FONT_HZK16_SIZE       267616      /* standard HZK16: 267,616 bytes */
 
-/* OLED Menu Buttons (all on free GPIOs, no conflict with PSRAM) */
-#define MIMI_OLED_BTN_UP_GPIO      45
-#define MIMI_OLED_BTN_DOWN_GPIO     5
-#define MIMI_OLED_BTN_SELECT_GPIO   6
-#define MIMI_OLED_BTN_BACK_GPIO     7
+/* OLED Menu Buttons (avoid FSPI pins GPIO5/6/7 used by QIO flash) */
+#define MIMI_OLED_BTN_UP_GPIO      13
+#define MIMI_OLED_BTN_DOWN_GPIO    10
+#define MIMI_OLED_BTN_SELECT_GPIO  11
+#define MIMI_OLED_BTN_BACK_GPIO    12
 
 /* WiFi Onboarding (Captive Portal) */
 #define MIMI_ONBOARD_AP_PREFIX    "MimiClaw-"

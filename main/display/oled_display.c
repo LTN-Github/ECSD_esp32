@@ -84,7 +84,6 @@ static bool s_inited = false;
 static bool s_hw_ok  = false;   /* I2C device responding? */
 
 /* ── Button GPIO state ──────────────────────────────────────────── */
-static SemaphoreHandle_t s_btn_sem = NULL;
 static TaskHandle_t      s_btn_task = NULL;
 static const int s_btn_gpios[4] = {
     MIMI_OLED_BTN_UP_GPIO,
@@ -92,6 +91,7 @@ static const int s_btn_gpios[4] = {
     MIMI_OLED_BTN_SELECT_GPIO,
     MIMI_OLED_BTN_BACK_GPIO,
 };
+static int s_btn_debounce[4] = {0, 0, 0, 0};  /* 连续低电平计数 */
 
 /* ================================================================
  *  6x8 ASCII 字体 (仅可打印字符 0x20-0x7E)
@@ -532,10 +532,16 @@ static void draw_title_bar(const char *title, int page_idx, int total,
     int y = 0;
 
     if (is_sub_page) {
-        /* "← [2.1] 模型信息" */
+        /* "← [2.1] 模型信息" — parent_pos is the autorotate index
+         * of the top-level parent page (1-based) */
+        int top = s_pages[page_idx].parent;
+        int parent_pos = 0;
+        for (int i = 0; i <= top && i < OLED_PAGE_COUNT; i++) {
+            if (s_pages[i].autorotate && s_pages[i].parent < 0) parent_pos++;
+        }
         snprintf(buf, sizeof(buf), "<- [%d.%d] %s",
-                 s_pages[page_idx].parent + 1,
-                 page_idx - s_pages[s_pages[page_idx].parent].children[0] + 1,
+                 parent_pos,
+                 page_idx - s_pages[top].children[0] + 1,
                  title);
     } else {
         /* "[1/5] 系统状态" */
@@ -1103,63 +1109,67 @@ oled_mode_t oled_display_get_mode(void)
     return s_mode;
 }
 
-/* ── Button Hardware: GPIO ISR + debounce task ─────────────────── */
+/* ── Button Hardware: pure polling + debounce ──────────────────── */
 
-static void IRAM_ATTR btn_isr(void *arg)
-{
-    BaseType_t wake = pdFALSE;
-    xSemaphoreGiveFromISR(s_btn_sem, &wake);
-    if (wake == pdTRUE) portYIELD_FROM_ISR();
-}
+#define BTN_SCAN_MS         20    /* 50 Hz scan rate */
+#define BTN_DEBOUNCE_CNT     2    /* N consecutive lows → valid press */
+
+/* Order must match s_btn_gpios[] */
+typedef void (*btn_handler_t)(void);
+static const btn_handler_t s_btn_handlers[4] = {
+    oled_display_btn_up,
+    oled_display_btn_down,
+    oled_display_btn_select,
+    oled_display_btn_back,
+};
 
 static void btn_task(void *arg)
 {
     (void)arg;
     while (1) {
-        /* Wait for any button press */
-        xSemaphoreTake(s_btn_sem, portMAX_DELAY);
-
-        /* Debounce: wait 50ms then read stable level */
-        vTaskDelay(pdMS_TO_TICKS(50));
-
-        /* Read all 4 GPIOs; active-low (pressed = 0) */
-        if (gpio_get_level(s_btn_gpios[0]) == 0) oled_display_btn_up();
-        if (gpio_get_level(s_btn_gpios[1]) == 0) oled_display_btn_down();
-        if (gpio_get_level(s_btn_gpios[2]) == 0) oled_display_btn_select();
-        if (gpio_get_level(s_btn_gpios[3]) == 0) oled_display_btn_back();
+        for (int i = 0; i < 4; i++) {
+            if (gpio_get_level(s_btn_gpios[i]) == 0) {
+                /* Pressed */
+                if (s_btn_debounce[i] < BTN_DEBOUNCE_CNT) {
+                    s_btn_debounce[i]++;
+                    if (s_btn_debounce[i] == BTN_DEBOUNCE_CNT) {
+                        s_btn_handlers[i]();
+                    }
+                }
+            } else {
+                /* Released — wind down */
+                if (s_btn_debounce[i] > 0) {
+                    s_btn_debounce[i]--;
+                }
+            }
+        }
+        vTaskDelay(pdMS_TO_TICKS(BTN_SCAN_MS));
     }
 }
 
 esp_err_t oled_display_btn_init(void)
 {
-    /* Already initialised? */
-    if (s_btn_sem) return ESP_OK;
+    if (s_btn_task) return ESP_OK;
 
-    s_btn_sem = xSemaphoreCreateBinary();
-    if (!s_btn_sem) {
-        ESP_LOGE(TAG, "btn semaphore create failed");
-        return ESP_ERR_NO_MEM;
-    }
-
-    /* Install GPIO ISR service (safe to call multiple times) */
-    gpio_install_isr_service(0);
-
-    /* Configure each button GPIO as input with pull-up */
+    /* Configure each button GPIO as input with pull-up (no ISR) */
     for (int i = 0; i < 4; i++) {
         gpio_config_t cfg = {
             .pin_bit_mask = (1ULL << s_btn_gpios[i]),
             .mode         = GPIO_MODE_INPUT,
             .pull_up_en   = GPIO_PULLUP_ENABLE,
             .pull_down_en = GPIO_PULLDOWN_DISABLE,
-            .intr_type    = GPIO_INTR_NEGEDGE,  /* falling edge = press */
+            .intr_type    = GPIO_INTR_DISABLE,
         };
-        gpio_config(&cfg);
-        gpio_isr_handler_add(s_btn_gpios[i], btn_isr, NULL);
+        esp_err_t err = gpio_config(&cfg);
+        if (err != ESP_OK) {
+            ESP_LOGE(TAG, "btn GPIO%d config failed: %s",
+                     s_btn_gpios[i], esp_err_to_name(err));
+            return err;
+        }
     }
 
-    /* Start button debounce task */
     BaseType_t ok = xTaskCreate(btn_task, "oled_btn", 2048, NULL,
-                                 3, &s_btn_task);
+                                 1, &s_btn_task);  /* low priority, don't preempt OLED */
     if (ok != pdPASS || !s_btn_task) {
         ESP_LOGE(TAG, "btn task create failed");
         return ESP_FAIL;

@@ -7,6 +7,7 @@
 #include "freertos/task.h"
 #include "freertos/semphr.h"
 #include "esp_log.h"
+#include "driver/gpio.h"
 #include "driver/rmt_tx.h"
 #include "driver/rmt_rx.h"
 #include "driver/rmt_encoder.h"
@@ -131,7 +132,7 @@ esp_err_t ir_driver_init(void)
         err = rmt_new_tx_channel(&tx_cfg, &s_tx_channel);
         if (err != ESP_OK) {
             ESP_LOGE(TAG, "rmt_new_tx_channel: %s", esp_err_to_name(err));
-            goto fail_tx;
+            goto fail_rx_cleanup;
         }
         rmt_carrier_config_t carrier_cfg = {
             .frequency_hz = MIMI_IR_CARRIER_HZ,
@@ -150,7 +151,43 @@ esp_err_t ir_driver_init(void)
         ESP_LOGI(TAG, "init ok (RX=GPIO%d, TX=GPIO%d, carrier=%dHz)",
                  MIMI_IR_RX_GPIO, MIMI_IR_TX_GPIO, MIMI_IR_CARRIER_HZ);
     } else {
-        ESP_LOGI(TAG, "init ok (half-duplex on GPIO%d, carrier=%dHz)",
+        /* Half-duplex: create TX as default (sending is the common case).
+         * RX channel is created on demand when ir_receive_raw() is called.
+         * First tear down the RX channel created above — they share the same GPIO. */
+        rmt_disable(s_rx_channel);
+        rmt_del_channel(s_rx_channel);
+        s_rx_channel = NULL;
+
+        /* Reset GPIO leftovers from RX config (pull-up, input enable) */
+        gpio_reset_pin(MIMI_IR_TX_GPIO);
+
+        rmt_tx_channel_config_t tx_cfg = {
+            .gpio_num            = MIMI_IR_TX_GPIO,
+            .clk_src             = RMT_CLK_SRC_DEFAULT,
+            .resolution_hz       = MIMI_IR_TX_RESOLUTION_HZ,
+            .mem_block_symbols   = MIMI_IR_TX_MEM_BLOCKS,
+            .trans_queue_depth   = 4,
+        };
+        err = rmt_new_tx_channel(&tx_cfg, &s_tx_channel);
+        if (err != ESP_OK) {
+            ESP_LOGE(TAG, "rmt_new_tx_channel(hd): %s", esp_err_to_name(err));
+            goto fail_rx_cleanup;
+        }
+        rmt_carrier_config_t carrier_cfg = {
+            .frequency_hz = MIMI_IR_CARRIER_HZ,
+            .duty_cycle   = 0.33f,
+        };
+        err = rmt_apply_carrier(s_tx_channel, &carrier_cfg);
+        if (err != ESP_OK) {
+            ESP_LOGE(TAG, "rmt_apply_carrier(hd): %s", esp_err_to_name(err));
+            goto fail_tx_enable;
+        }
+        err = rmt_enable(s_tx_channel);
+        if (err != ESP_OK) {
+            ESP_LOGE(TAG, "rmt_enable tx(hd): %s", esp_err_to_name(err));
+            goto fail_tx_enable;
+        }
+        ESP_LOGI(TAG, "init ok (half-duplex GPIO%d, default=TX, carrier=%dHz)",
                  MIMI_IR_RX_GPIO, MIMI_IR_CARRIER_HZ);
     }
 
@@ -160,7 +197,7 @@ esp_err_t ir_driver_init(void)
 fail_tx_enable:
     rmt_del_channel(s_tx_channel);
     s_tx_channel = NULL;
-fail_tx:
+fail_rx_cleanup:
     rmt_disable(s_rx_channel);
 fail_rx:
     rmt_del_channel(s_rx_channel);
@@ -175,17 +212,22 @@ fail_mutex:
  *  Half-Duplex Helpers (shared RX/TX pin — dynamic create/destroy)
  * ================================================================ */
 
-/* Destroy RX, create TX on the shared GPIO. Caller holds s_ir_mutex. */
+/* Ensure TX channel is active on the shared GPIO. Caller holds s_ir_mutex. */
 static esp_err_t ir_switch_to_tx(void)
 {
     if (!s_shared_pin) return ESP_OK;
+    if (s_tx_channel) return ESP_OK;  /* TX is the default mode */
 
-    /* Tear down RX */
+    /* Tear down RX (if still present from a previous receive) */
     if (s_rx_channel) {
         rmt_disable(s_rx_channel);
         rmt_del_channel(s_rx_channel);
         s_rx_channel = NULL;
     }
+
+    /* After RX deletion the shared GPIO may retain pull-up / input config.
+     * Reset it before handing it to the TX channel. */
+    gpio_reset_pin(MIMI_IR_TX_GPIO);
 
     /* Create TX on the shared GPIO */
     rmt_tx_channel_config_t tx_cfg = {
@@ -222,13 +264,13 @@ static esp_err_t ir_switch_to_tx(void)
     return err;
 }
 
-/* Destroy TX, recreate RX on the shared GPIO. Caller holds s_ir_mutex. */
+/* Ensure RX channel is active on the shared GPIO. Caller holds s_ir_mutex. */
 static esp_err_t ir_switch_to_rx(void)
 {
     if (!s_shared_pin) return ESP_OK;
-    if (s_rx_channel != NULL) return ESP_OK;  /* already in RX mode */
+    if (s_rx_channel) return ESP_OK;  /* already in RX mode */
 
-    /* Tear down TX */
+    /* Tear down TX (default mode) */
     if (s_tx_channel) {
         rmt_disable(s_tx_channel);
         rmt_del_channel(s_tx_channel);
@@ -471,6 +513,10 @@ static esp_err_t transmit_raw(const uint16_t *raw, size_t count)
         }
     }
 
+    /* Keep each chunk within ping_pong_symbols so the copy encoder
+     * finishes in one pass (ENCODING_COMPLETE), no threshold ISR needed. */
+    #define ONE_SHOT_SYMBOLS  24
+
     rmt_transmit_config_t tx_cfg = {
         .loop_count = 0,
         .flags      = { .eot_level = 0 },
@@ -486,31 +532,66 @@ static esp_err_t transmit_raw(const uint16_t *raw, size_t count)
         return err;
     }
 
-    err = rmt_transmit(s_tx_channel, NULL,
-                        syms, symbol_count * sizeof(rmt_symbol_word_t),
-                        &tx_cfg);
+    /* Send in chunks that fit in one encoder pass */
+    size_t symbols_sent = 0;
+    int chunk_idx = 0;
+
+    while (symbols_sent < symbol_count) {
+        size_t chunk_syms = symbol_count - symbols_sent;
+        if (chunk_syms > ONE_SHOT_SYMBOLS) chunk_syms = ONE_SHOT_SYMBOLS;
+        chunk_idx++;
+
+        rmt_encoder_handle_t copy_encoder = NULL;
+        rmt_copy_encoder_config_t copy_enc_cfg = {};
+        err = rmt_new_copy_encoder(&copy_enc_cfg, &copy_encoder);
+        if (err != ESP_OK) {
+            ESP_LOGE(TAG, "rmt_new_copy_encoder: %s", esp_err_to_name(err));
+            free(syms);
+            xSemaphoreGive(s_ir_mutex);
+            return err;
+        }
+
+        ESP_LOGI(TAG, "chunk %d: sending %d symbols", chunk_idx, (int)chunk_syms);
+        err = rmt_transmit(s_tx_channel, copy_encoder,
+                            &syms[symbols_sent], chunk_syms * sizeof(rmt_symbol_word_t),
+                            &tx_cfg);
+        if (err != ESP_OK) {
+            ESP_LOGE(TAG, "rmt_transmit: %s", esp_err_to_name(err));
+            rmt_del_encoder(copy_encoder);
+            free(syms);
+            if (s_shared_pin) ir_switch_to_rx();
+            xSemaphoreGive(s_ir_mutex);
+            return err;
+        }
+
+        /* Wait for this chunk to finish */
+        uint32_t chunk_us = (uint32_t)((uint64_t)total_us * chunk_syms / symbol_count);
+        uint32_t chunk_timeout_ms = (chunk_us / 1000) + 200;
+        if (chunk_timeout_ms < 500) chunk_timeout_ms = 500;
+        ESP_LOGI(TAG, "chunk %d: waiting (timeout=%lums)", chunk_idx, (unsigned long)chunk_timeout_ms);
+        err = rmt_tx_wait_all_done(s_tx_channel, pdMS_TO_TICKS(chunk_timeout_ms));
+        if (err != ESP_OK) {
+            ESP_LOGE(TAG, "tx wait chunk %d: %s (timeout=%lums)",
+                     chunk_idx, esp_err_to_name(err), (unsigned long)chunk_timeout_ms);
+            rmt_del_encoder(copy_encoder);
+            free(syms);
+            if (s_shared_pin) ir_switch_to_rx();
+            xSemaphoreGive(s_ir_mutex);
+            return err;
+        }
+
+        rmt_del_encoder(copy_encoder);
+        symbols_sent += chunk_syms;
+    }
+
     free(syms);
 
-    if (err != ESP_OK) {
-        ESP_LOGE(TAG, "rmt_transmit: %s", esp_err_to_name(err));
-        ir_switch_to_rx();
-        xSemaphoreGive(s_ir_mutex);
-        return err;
-    }
-
-    /* Wait for transmission to complete.
-     * Timeout = frame duration + 100ms margin, minimum 500ms.
-     * NEC frames: ~67ms, Midea AC: ~124ms, Gree AC: ~139ms. */
-    uint32_t timeout_ms = (total_us / 1000) + 100;
-    if (timeout_ms < 500) timeout_ms = 500;
-    err = rmt_tx_wait_all_done(s_tx_channel, pdMS_TO_TICKS(timeout_ms));
-    if (err != ESP_OK) {
-        ESP_LOGE(TAG, "tx wait: %s (timeout=%lums)", esp_err_to_name(err),
-                 (unsigned long)timeout_ms);
-    }
+    ESP_LOGI(TAG, "TX done: %d symbols in %d chunk(s)",
+             (int)symbol_count,
+             (int)((symbol_count + ONE_SHOT_SYMBOLS - 1) / ONE_SHOT_SYMBOLS));
 
     /* Half-duplex: restore RX mode */
-    ir_switch_to_rx();
+    if (s_shared_pin) ir_switch_to_rx();
     xSemaphoreGive(s_ir_mutex);
     return err;
 }

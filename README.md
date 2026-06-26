@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <strong><a href="README.md">English</a> | <a href="README_CN.md">中文</a> | <a href="README_JA.md">日本語</a></strong>
+  <strong><a href="README.md">中文</a> | <a href="README_EN.md">English</a> | <a href="README_JA.md">日本語</a></strong>
 </p>
 
 **$5 芯片上的 AI 助理（OpenClaw）。没有 Linux，没有 Node.js，纯 C。**
@@ -205,14 +205,33 @@ mimi> config_reset                 # 清除 NVS，恢复编译时默认值
 
 ```
 mimi> wifi_status              # 连上了吗？
+mimi> wifi_scan                # 扫描附近 WiFi 网络
 mimi> memory_read              # 看看它记住了什么
 mimi> memory_write "内容"       # 写入 MEMORY.md
 mimi> heap_info                # 还剩多少内存？
 mimi> session_list             # 列出所有会话
 mimi> session_clear 12345      # 删除一个会话
-mimi> heartbeat_trigger           # 手动触发一次心跳检查
-mimi> cron_start                  # 立即启动 cron 调度器
-mimi> restart                     # 重启
+mimi> heartbeat_trigger        # 手动触发一次心跳检查
+mimi> cron_start               # 立即启动 cron 调度器
+mimi> tool_exec gpio_read {"pin":12}  # 手动执行工具
+mimi> web_search "天气"         # 从 CLI 发起网页搜索
+mimi> restart                  # 重启
+```
+
+**技能系统（Skills）：**
+
+```
+mimi> skill_list               # 列出所有已加载的技能
+mimi> skill_show <名称>         # 查看技能详情
+mimi> skill_search <关键词>     # 搜索技能
+```
+
+**飞书通道：**
+
+```
+mimi> feishu_creds <AppID> <AppSecret>  # 设置飞书凭证
+mimi> feishu_send <消息>                 # 发送飞书消息
+```
 
 **OLED 菜单控制：**
 
@@ -220,7 +239,6 @@ mimi> restart                     # 重启
 mimi> oled_page <页号>         # 跳转到指定页面（0-11），30 秒后恢复轮播
 mimi> oled_page auto            # 恢复自动轮播
 mimi> oled_list                 # 列出所有 OLED 菜单页面
-```
 ```
 
 ### USB (JTAG) 与 UART：哪个口做什么
@@ -297,9 +315,9 @@ MimiClaw 同时支持 Anthropic 和 OpenAI 的工具调用 — LLM 在对话中�
 | `ir_send` | 发送已学习的红外代码，控制家电 | 是 | 是 |
 | `ir_list` | 列出所有已学习的红外代码 | 是 | 是 |
 | `ir_receive` | 学习红外遥控器代码 | 是 | — |
-| `file_read` | 读取 SPIFFS 文件内容 | 是 | — |
-| `file_write` | 写入 SPIFFS 文件 | 是 | — |
-| `file_edit` | 查找替换文件内容 | 是 | — |
+| `read_file` | 读取 SPIFFS 文件内容 | 是 | — |
+| `write_file` | 写入 SPIFFS 文件 | 是 | — |
+| `edit_file` | 查找替换文件内容 | 是 | — |
 | `list_dir` | 列出 SPIFFS 目录内容 | 是 | — |
 
 > **Slave 列说明**：标记"是"的工具可通过 ESP-NOW 命令在从机上远程执行。标记"—"的工具为 Master 独有（依赖网络/文件系统/LLM）。
@@ -343,7 +361,7 @@ MimiClaw 支持通过 I2C 连接的 SSD1309 OLED 显示屏（128×64 像素）�
 
 **导航方式**：
 - **自动轮播**：每 3 秒自动切换一级页面（5 页循环）
-- **4 物理按键**（UP=45, DOWN=5, SEL=6, BACK=7）：UP/DOWN 翻页、SELECT 下钻、BACK 返回，30 秒无操作恢复自动轮播
+- **4 物理按键**（UP=13, DOWN=10, SEL=11, BACK=12）：UP/DOWN 翻页、SELECT 下钻、BACK 返回，30 秒无操作恢复自动轮播
 
 **CLI 命令**：
 ```
@@ -422,8 +440,10 @@ MimiClaw 内置 cron 调度器，让 AI 可以自主安排任务。LLM 可以通
 - **定时任务** — AI 可自主创建周期性和一次性任务，重启后持久保存
 - **心跳服务** — 定期检查任务文件，驱动 AI 自主执行
 - **工具调用** — ReAct Agent 循环，两种提供商均支持工具调用
+- **技能系统** — 可加载的 Skills 模块，扩展 AI 能力（skill_loader），CLI 可查
+- **工具注册表** — 动态注册/查找工具（tool_registry），统一管理所有硬件和网络工具
 - **红外遥控** — 学习/发送红外码，预置美的、格力空调码，开箱即可控制家电
-- **GPIO 控制** — 数字输入/输出，可用于控制继电器、传感器等
+- **GPIO 控制** — 数字输入/输出，可用于控制继电器、传感器等（含引脚白名单安全策略）
 - **WS2812 灯带** — 可控全彩 LED 灯带
 - **ESP-NOW 多设备组网** — 主从架构，同一固件按角色分叉。Master 运行 AI Agent，Slave 只跑从机执行器（slave_executor），省内存、只等命令
 - **OLED 显示屏** — SSD1309 128×64，中文 UTF-8 支持，13 页多级菜单，4 按键导航，CLI 可控
@@ -463,13 +483,13 @@ MIT
 
 | GPIO | 功能 | 备注 |
 | :--- | :--- | :--- |
-| **GPIO4** | IR 红外收发 | 半双工，收/发复用 |
-| **GPIO5** | BTN DOWN（菜单下翻） | 4 按键之一，按键按下为低电平 |
-| **GPIO6** | BTN SELECT（菜单确认） | 4 按键之一 |
-| **GPIO7** | BTN BACK（菜单返回） | 4 按键之一 |
 | **GPIO1** | OLED I2C SDA | SSD1309 数据线 |
 | **GPIO2** | OLED I2C SCL | SSD1309 时钟线 |
-| **GPIO45** | BTN UP（菜单上翻） | 4 按键之一 |
+| **GPIO4** | IR 红外收发 | 半双工，收/发复用（QIO flash 注意 FSPIHD） |
+| **GPIO10** | BTN DOWN（菜单下翻） | 4 按键之一，按键按下为低电平 |
+| **GPIO11** | BTN SELECT（菜单确认） | 4 按键之一 |
+| **GPIO12** | BTN BACK（菜单返回） | 4 按键之一 |
+| **GPIO13** | BTN UP（菜单上翻） | 4 按键之一 |
 | **GPIO48** | WS2812 RGB LED | 板载全彩 LED（RMT 驱动） |
 
 ### 系统保留引脚（不可使用）
@@ -504,20 +524,20 @@ MIT
 
 | GPIO | 备注 |
 | :--- | :--- |
+| GPIO5 | 可自由使用（QIO flash 注意 FSPIWP） |
+| GPIO6 | 可自由使用（QIO flash 注意 FSPIIO5） |
+| GPIO7 | 可自由使用（QIO flash 注意 FSPIIO6） |
 | GPIO8 | 可自由使用 |
 | GPIO9 | 可自由使用 |
-| GPIO10 | 可自由使用 |
-| GPIO11 | 可自由使用 |
-| GPIO12 | 可自由使用 |
-| GPIO13 | 可自由使用 |
 | GPIO14 | 可自由使用 |
 | GPIO15 | 可自由使用 |
 | GPIO16 | 可自由使用 |
 | GPIO17 | 可自由使用 |
 | GPIO18 | 可自由使用 |
 | GPIO21 | 可自由使用 |
+| GPIO45 | 可自由使用（Strapping pin，注意外部电路） |
 
-共 **12 个**空闲 GPIO 可用于扩展功能。以上引脚均不与 PSRAM、Flash、USB、JTAG、OLED、IR、WS2812 或按键冲突。
+共 **12 个**空闲 GPIO 可用于扩展功能。GPIO5/6/7 在 QIO Flash 模式下为 FSPI 接口引脚，空闲时可用但需确认 Flash 实际运行在 DIO 模式。GPIO45 为 Strapping pin，上电时决定启动模式，外部电路需确保上电电平正确。
 
 
 
